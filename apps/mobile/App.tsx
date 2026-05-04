@@ -48,25 +48,3 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded || fontError) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, fontError]);
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
-
-  return (
-    <SafeAreaProvider onLayout={onLayoutRootView}>
-      <I18nextProvider i18n={i18n}>
-        <NavigationContainer>
-          <StatusBar style="light" backgroundColor={Colors.deepNavy} />
-          <AppNavigator />
-        </NavigationContainer>
-      </I18nextProvider>
-    </SafeAreaProvider>
-  );
-}
