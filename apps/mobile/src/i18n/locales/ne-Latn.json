@@ -1,0 +1,81 @@
+{
+  "common": {
+    "appName": "SydneyGo",
+    "loading": "Load gardai cha...",
+    "error": "Kei galat bhayo",
+    "retry": "Pheri prayaas garne",
+    "back": "Farkine",
+    "next": "Aghi",
+    "done": "Bhayo",
+    "cancel": "Radd garne",
+    "save": "Sachhine",
+    "search": "Khojne",
+    "close": "Banda garne"
+  },
+  "screens": {
+    "languageSelection": {
+      "title": "Aafno bhasha छान्नुस",
+      "subtitle": "Suru garna aafno ruchaaeko bhasha छान्नुस",
+      "continue": "Jaari rakhne"
+    },
+    "aiOnboarding": {
+      "title": "SydneyGo ma swagat cha",
+      "greeting": "Namaste! Ma tapaaiko Sydney yatra saathi hun. Tapaaile kun kisimko saahaso khojdai hunuhuncha bataaunuhos.",
+      "placeholder": "Aafno sandesh taaipne...",
+      "send": "Pathaune"
+    },
+    "overview3d": {
+      "title": "Sydney ko sinhaawaalokan",
+      "explore": "Shahar explore garne"
+    },
+    "home": {
+      "title": "Ghar",
+      "greeting": "{{time}}, {{name}}!",
+      "discover": "Sydney paatlaune"
+    },
+    "aiChat": {
+      "title": "AI Sahaayak",
+      "placeholder": "Sydney baare kei pani sodhne...",
+      "send": "Pathaune"
+    },
+    "map3d": {
+      "title": "3D Naksaa",
+      "layers": "Taahaa",
+      "myLocation": "Mero sthaan"
+    },
+    "itinerary": {
+      "title": "Mero yaatraa suchi",
+      "addItem": "Item thaapne",
+      "empty": "Ahile kei chaina — explore suru garne!"
+    },
+    "explore": {
+      "title": "Explore",
+      "categories": "Shreniharu",
+      "nearby": "Najikai"
+    },
+    "restaurants": {
+      "title": "Bhojanaalaya",
+      "filter": "Chhanne",
+      "sortBy": "Kramabaddha garne"
+    },
+    "transport": {
+      "title": "Yaatraasaadhan",
+      "planJourney": "Yaatraa yojana banaune",
+      "from": "Baata",
+      "to": "Samma"
+    },
+    "profile": {
+      "title": "Praarupik",
+      "settings": "Seттing",
+      "language": "Bhasha",
+      "logout": "Bahirinne"
+    }
+  },
+  "navigation": {
+    "home": "Ghar",
+    "explore": "Explore",
+    "map": "Naksaa",
+    "itinerary": "Yaatraa",
+    "profile": "Praarupik"
+  }
+}

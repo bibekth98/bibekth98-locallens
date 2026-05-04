@@ -1,0 +1,81 @@
+{
+  "common": {
+    "appName": "SydneyGo",
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ ما",
+    "retry": "إعادة المحاولة",
+    "back": "رجوع",
+    "next": "التالي",
+    "done": "تم",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "search": "بحث",
+    "close": "إغلاق"
+  },
+  "screens": {
+    "languageSelection": {
+      "title": "اختر لغتك",
+      "subtitle": "اختر لغتك المفضلة للبدء",
+      "continue": "متابعة"
+    },
+    "aiOnboarding": {
+      "title": "مرحباً بك في SydneyGo",
+      "greeting": "مرحباً! أنا رفيق سفرك في سيدني. أخبرني عن نوع المغامرة التي تبحث عنها.",
+      "placeholder": "اكتب رسالتك...",
+      "send": "إرسال"
+    },
+    "overview3d": {
+      "title": "نظرة عامة على سيدني",
+      "explore": "استكشف المدينة"
+    },
+    "home": {
+      "title": "الرئيسية",
+      "greeting": "{{time}}، {{name}}!",
+      "discover": "اكتشف سيدني"
+    },
+    "aiChat": {
+      "title": "المساعد الذكي",
+      "placeholder": "اسألني أي شيء عن سيدني...",
+      "send": "إرسال"
+    },
+    "map3d": {
+      "title": "خريطة ثلاثية الأبعاد",
+      "layers": "الطبقات",
+      "myLocation": "موقعي"
+    },
+    "itinerary": {
+      "title": "برنامجي السياحي",
+      "addItem": "إضافة عنصر",
+      "empty": "لا توجد عناصر بعد — ابدأ الاستكشاف!"
+    },
+    "explore": {
+      "title": "استكشاف",
+      "categories": "الفئات",
+      "nearby": "القريبة"
+    },
+    "restaurants": {
+      "title": "المطاعم",
+      "filter": "تصفية",
+      "sortBy": "ترتيب حسب"
+    },
+    "transport": {
+      "title": "المواصلات",
+      "planJourney": "تخطيط الرحلة",
+      "from": "من",
+      "to": "إلى"
+    },
+    "profile": {
+      "title": "الملف الشخصي",
+      "settings": "الإعدادات",
+      "language": "اللغة",
+      "logout": "تسجيل الخروج"
+    }
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "explore": "استكشاف",
+    "map": "الخريطة",
+    "itinerary": "البرنامج",
+    "profile": "الملف"
+  }
+}
