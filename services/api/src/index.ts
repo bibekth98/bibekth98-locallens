@@ -17,7 +17,11 @@ const app: Application = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: Env.ALLOWED_ORIGINS.length ? Env.ALLOWED_ORIGINS : '*',
+    origin: Env.ALLOWED_ORIGINS.length
+      ? Env.ALLOWED_ORIGINS
+      : Env.NODE_ENV === 'production'
+        ? false // deny all cross-origin requests in production if origins not configured
+        : 'http://localhost:19006',
     credentials: true,
   }),
 );
@@ -26,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan(Env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
-app.use('/', healthRouter);
+app.use('/health', healthRouter);
 app.use('/v1/ai', aiRouter);
 app.use('/v1/places', placesRouter);
 app.use('/v1/restaurants', restaurantsRouter);

@@ -6,7 +6,7 @@ const router = Router();
  * GET /health
  * Liveness probe – returns 200 when the server is up.
  */
-router.get('/health', (_req, res) => {
+router.get('/', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
