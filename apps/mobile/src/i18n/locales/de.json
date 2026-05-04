@@ -1,0 +1,81 @@
+{
+  "common": {
+    "appName": "SydneyGo",
+    "loading": "Wird geladen...",
+    "error": "Etwas ist schiefgelaufen",
+    "retry": "Erneut versuchen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "done": "Fertig",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "search": "Suchen",
+    "close": "Schließen"
+  },
+  "screens": {
+    "languageSelection": {
+      "title": "Sprache auswählen",
+      "subtitle": "Wählen Sie Ihre bevorzugte Sprache, um zu beginnen",
+      "continue": "Weiter"
+    },
+    "aiOnboarding": {
+      "title": "Willkommen bei SydneyGo",
+      "greeting": "Hallo! Ich bin Ihr Sydney-Reisebegleiter. Sagen Sie mir, welche Art von Abenteuer Sie suchen.",
+      "placeholder": "Nachricht eingeben...",
+      "send": "Senden"
+    },
+    "overview3d": {
+      "title": "Sydney Überblick",
+      "explore": "Stadt erkunden"
+    },
+    "home": {
+      "title": "Startseite",
+      "greeting": "Guten {{time}}, {{name}}!",
+      "discover": "Sydney entdecken"
+    },
+    "aiChat": {
+      "title": "KI-Assistent",
+      "placeholder": "Fragen Sie mich alles über Sydney...",
+      "send": "Senden"
+    },
+    "map3d": {
+      "title": "3D-Karte",
+      "layers": "Ebenen",
+      "myLocation": "Mein Standort"
+    },
+    "itinerary": {
+      "title": "Mein Reiseplan",
+      "addItem": "Element hinzufügen",
+      "empty": "Noch keine Einträge — fangen Sie an zu erkunden!"
+    },
+    "explore": {
+      "title": "Erkunden",
+      "categories": "Kategorien",
+      "nearby": "In der Nähe"
+    },
+    "restaurants": {
+      "title": "Restaurants",
+      "filter": "Filtern",
+      "sortBy": "Sortieren nach"
+    },
+    "transport": {
+      "title": "Transport",
+      "planJourney": "Reise planen",
+      "from": "Von",
+      "to": "Nach"
+    },
+    "profile": {
+      "title": "Profil",
+      "settings": "Einstellungen",
+      "language": "Sprache",
+      "logout": "Abmelden"
+    }
+  },
+  "navigation": {
+    "home": "Startseite",
+    "explore": "Erkunden",
+    "map": "Karte",
+    "itinerary": "Reiseplan",
+    "profile": "Profil"
+  }
+}
