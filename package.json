@@ -1,0 +1,17 @@
+{
+  "name": "sydneygo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SydneyGo – Mobile Tourism Super-App (monorepo)",
+  "workspaces": [
+    "apps/mobile",
+    "services/api"
+  ],
+  "scripts": {
+    "mobile": "cd apps/mobile && expo start",
+    "api": "cd services/api && npm run dev"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
