@@ -10,27 +10,27 @@ const router = Router();
  * PUT  /itineraries/:id     – update itinerary
  * DELETE /itineraries/:id   – delete itinerary
  *
- * Full implementation wired in Step 2.
+ * Placeholder routes – full implementation in Step 4 (auth + persistence).
  */
 
 router.get('/', asyncHandler(async (_req: Request, res: Response) => {
-  res.status(501).json({ error: { message: 'List itineraries – implemented in Step 2' } });
+  res.status(501).json({ error: { message: 'List itineraries – implemented in Step 4' } });
 }));
 
 router.post('/', asyncHandler(async (_req: Request, res: Response) => {
-  res.status(501).json({ error: { message: 'Create itinerary – implemented in Step 2' } });
+  res.status(501).json({ error: { message: 'Create itinerary – implemented in Step 4' } });
 }));
 
 router.get('/:id', asyncHandler(async (_req: Request, res: Response) => {
-  res.status(501).json({ error: { message: 'Itinerary detail – implemented in Step 2' } });
+  res.status(501).json({ error: { message: 'Itinerary detail – implemented in Step 4' } });
 }));
 
 router.put('/:id', asyncHandler(async (_req: Request, res: Response) => {
-  res.status(501).json({ error: { message: 'Update itinerary – implemented in Step 2' } });
+  res.status(501).json({ error: { message: 'Update itinerary – implemented in Step 4' } });
 }));
 
 router.delete('/:id', asyncHandler(async (_req: Request, res: Response) => {
-  res.status(501).json({ error: { message: 'Delete itinerary – implemented in Step 2' } });
+  res.status(501).json({ error: { message: 'Delete itinerary – implemented in Step 4' } });
 }));
 
 export default router;
