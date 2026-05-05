@@ -1,0 +1,81 @@
+{
+  "common": {
+    "appName": "SydneyGo",
+    "loading": "लोड हो रहा है...",
+    "error": "कुछ गलत हो गया",
+    "retry": "पुनः प्रयास",
+    "back": "वापस",
+    "next": "अगला",
+    "done": "हो गया",
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "search": "खोजें",
+    "close": "बंद करें"
+  },
+  "screens": {
+    "languageSelection": {
+      "title": "अपनी भाषा चुनें",
+      "subtitle": "शुरू करने के लिए अपनी पसंदीदा भाषा चुनें",
+      "continue": "जारी रखें"
+    },
+    "aiOnboarding": {
+      "title": "SydneyGo में आपका स्वागत है",
+      "greeting": "नमस्ते! मैं आपका सिडनी यात्रा साथी हूं। बताएं आप किस तरह का रोमांच ढूंढ रहे हैं।",
+      "placeholder": "अपना संदेश टाइप करें...",
+      "send": "भेजें"
+    },
+    "overview3d": {
+      "title": "सिडनी अवलोकन",
+      "explore": "शहर एक्सप्लोर करें"
+    },
+    "home": {
+      "title": "होम",
+      "greeting": "{{time}}, {{name}}!",
+      "discover": "सिडनी खोजें"
+    },
+    "aiChat": {
+      "title": "AI सहायक",
+      "placeholder": "सिडनी के बारे में कुछ भी पूछें...",
+      "send": "भेजें"
+    },
+    "map3d": {
+      "title": "3D मैप",
+      "layers": "परतें",
+      "myLocation": "मेरी लोकेशन"
+    },
+    "itinerary": {
+      "title": "मेरी यात्रा सूची",
+      "addItem": "आइटम जोड़ें",
+      "empty": "अभी कोई आइटम नहीं — एक्सप्लोर करना शुरू करें!"
+    },
+    "explore": {
+      "title": "एक्सप्लोर",
+      "categories": "श्रेणियां",
+      "nearby": "नजदीक"
+    },
+    "restaurants": {
+      "title": "रेस्तरां",
+      "filter": "फ़िल्टर",
+      "sortBy": "क्रमबद्ध करें"
+    },
+    "transport": {
+      "title": "परिवहन",
+      "planJourney": "यात्रा योजना बनाएं",
+      "from": "से",
+      "to": "तक"
+    },
+    "profile": {
+      "title": "प्रोफ़ाइल",
+      "settings": "सेटिंग्स",
+      "language": "भाषा",
+      "logout": "लॉग आउट"
+    }
+  },
+  "navigation": {
+    "home": "होम",
+    "explore": "एक्सप्लोर",
+    "map": "मैप",
+    "itinerary": "यात्रा",
+    "profile": "प्रोफ़ाइल"
+  }
+}

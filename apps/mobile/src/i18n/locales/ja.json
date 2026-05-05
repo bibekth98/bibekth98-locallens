@@ -1,0 +1,81 @@
+{
+  "common": {
+    "appName": "SydneyGo",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "再試行",
+    "back": "戻る",
+    "next": "次へ",
+    "done": "完了",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "search": "検索",
+    "close": "閉じる"
+  },
+  "screens": {
+    "languageSelection": {
+      "title": "言語を選択してください",
+      "subtitle": "開始する言語を選択してください",
+      "continue": "続ける"
+    },
+    "aiOnboarding": {
+      "title": "SydneyGoへようこそ",
+      "greeting": "こんにちは！私はあなたのシドニー旅行コンパニオンです。どんな冒険をお探しですか？",
+      "placeholder": "メッセージを入力...",
+      "send": "送信"
+    },
+    "overview3d": {
+      "title": "シドニー概観",
+      "explore": "都市を探索"
+    },
+    "home": {
+      "title": "ホーム",
+      "greeting": "{{time}}、{{name}}！",
+      "discover": "シドニーを発見"
+    },
+    "aiChat": {
+      "title": "AIアシスタント",
+      "placeholder": "シドニーについて何でも聞いてください...",
+      "send": "送信"
+    },
+    "map3d": {
+      "title": "3Dマップ",
+      "layers": "レイヤー",
+      "myLocation": "現在地"
+    },
+    "itinerary": {
+      "title": "旅程",
+      "addItem": "追加",
+      "empty": "アイテムがありません — 探索を始めましょう！"
+    },
+    "explore": {
+      "title": "探索",
+      "categories": "カテゴリー",
+      "nearby": "近くの"
+    },
+    "restaurants": {
+      "title": "レストラン",
+      "filter": "フィルター",
+      "sortBy": "並べ替え"
+    },
+    "transport": {
+      "title": "交通",
+      "planJourney": "旅程計画",
+      "from": "出発地",
+      "to": "目的地"
+    },
+    "profile": {
+      "title": "プロフィール",
+      "settings": "設定",
+      "language": "言語",
+      "logout": "ログアウト"
+    }
+  },
+  "navigation": {
+    "home": "ホーム",
+    "explore": "探索",
+    "map": "マップ",
+    "itinerary": "旅程",
+    "profile": "プロフィール"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "common": {
+    "appName": "SydneyGo",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "cancel": "Cancel",
+    "save": "Save",
+    "search": "Search",
+    "close": "Close"
+  },
+  "screens": {
+    "languageSelection": {
+      "title": "Choose Your Language",
+      "subtitle": "Select your preferred language to get started",
+      "continue": "Continue"
+    },
+    "aiOnboarding": {
+      "title": "Welcome to SydneyGo",
+      "greeting": "Hi! I'm your Sydney travel companion. Tell me what kind of adventure you're looking for.",
+      "placeholder": "Type your message...",
+      "send": "Send"
+    },
+    "overview3d": {
+      "title": "Sydney Overview",
+      "explore": "Explore the City"
+    },
+    "home": {
+      "title": "Home",
+      "greeting": "Good {{time}}, {{name}}!",
+      "discover": "Discover Sydney"
+    },
+    "aiChat": {
+      "title": "AI Assistant",
+      "placeholder": "Ask me anything about Sydney...",
+      "send": "Send"
+    },
+    "map3d": {
+      "title": "3D Map",
+      "layers": "Layers",
+      "myLocation": "My Location"
+    },
+    "itinerary": {
+      "title": "My Itinerary",
+      "addItem": "Add Item",
+      "empty": "No items yet — start exploring!"
+    },
+    "explore": {
+      "title": "Explore",
+      "categories": "Categories",
+      "nearby": "Nearby"
+    },
+    "restaurants": {
+      "title": "Restaurants",
+      "filter": "Filter",
+      "sortBy": "Sort by"
+    },
+    "transport": {
+      "title": "Transport",
+      "planJourney": "Plan Journey",
+      "from": "From",
+      "to": "To"
+    },
+    "profile": {
+      "title": "Profile",
+      "settings": "Settings",
+      "language": "Language",
+      "logout": "Log Out"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "explore": "Explore",
+    "map": "Map",
+    "itinerary": "Itinerary",
+    "profile": "Profile"
+  }
+}

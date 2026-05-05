@@ -1,0 +1,81 @@
+{
+  "common": {
+    "appName": "SydneyGo",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "back": "Retour",
+    "next": "Suivant",
+    "done": "Terminé",
+    "cancel": "Annuler",
+    "save": "Sauvegarder",
+    "search": "Rechercher",
+    "close": "Fermer"
+  },
+  "screens": {
+    "languageSelection": {
+      "title": "Choisissez votre langue",
+      "subtitle": "Sélectionnez votre langue préférée pour commencer",
+      "continue": "Continuer"
+    },
+    "aiOnboarding": {
+      "title": "Bienvenue sur SydneyGo",
+      "greeting": "Bonjour ! Je suis votre compagnon de voyage à Sydney. Dites-moi quel type d'aventure vous recherchez.",
+      "placeholder": "Tapez votre message...",
+      "send": "Envoyer"
+    },
+    "overview3d": {
+      "title": "Vue d'ensemble de Sydney",
+      "explore": "Explorer la ville"
+    },
+    "home": {
+      "title": "Accueil",
+      "greeting": "Bonjour {{time}}, {{name}} !",
+      "discover": "Découvrir Sydney"
+    },
+    "aiChat": {
+      "title": "Assistant IA",
+      "placeholder": "Posez-moi n'importe quelle question sur Sydney...",
+      "send": "Envoyer"
+    },
+    "map3d": {
+      "title": "Carte 3D",
+      "layers": "Couches",
+      "myLocation": "Ma position"
+    },
+    "itinerary": {
+      "title": "Mon itinéraire",
+      "addItem": "Ajouter un élément",
+      "empty": "Aucun élément — commencez à explorer !"
+    },
+    "explore": {
+      "title": "Explorer",
+      "categories": "Catégories",
+      "nearby": "À proximité"
+    },
+    "restaurants": {
+      "title": "Restaurants",
+      "filter": "Filtrer",
+      "sortBy": "Trier par"
+    },
+    "transport": {
+      "title": "Transport",
+      "planJourney": "Planifier un trajet",
+      "from": "De",
+      "to": "À"
+    },
+    "profile": {
+      "title": "Profil",
+      "settings": "Paramètres",
+      "language": "Langue",
+      "logout": "Se déconnecter"
+    }
+  },
+  "navigation": {
+    "home": "Accueil",
+    "explore": "Explorer",
+    "map": "Carte",
+    "itinerary": "Itinéraire",
+    "profile": "Profil"
+  }
+}
