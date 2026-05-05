@@ -21,8 +21,10 @@ import {
 import { FeatureFlags } from '@/config/featureFlags';
 
 // ─── Conditional imports – react-native-maps not available on web ─────────────
-let MapView: React.ComponentType<MapViewProps> | null = null;
-let Camera: React.ComponentType<CameraProps> | null = null;
+
+interface MapViewInstance {
+  animateCamera: (camera: CameraConfig, opts?: { duration?: number }) => void;
+}
 
 interface MapViewProps {
   style?: object;
@@ -35,13 +37,8 @@ interface MapViewProps {
   scrollEnabled?: boolean;
   zoomEnabled?: boolean;
   onMapReady?: () => void;
-  ref?: React.RefObject<MapViewInstance>;
   children?: React.ReactNode;
   provider?: string;
-}
-
-interface MapViewInstance {
-  animateCamera: (camera: CameraConfig, opts?: { duration?: number }) => void;
 }
 
 interface CameraConfig {
@@ -59,6 +56,16 @@ interface CameraProps {
   zoom?: number;
   centerCoordinate?: [number, number];
 }
+
+/** react-native-maps MapView exposes imperative methods via ref. */
+type MapViewType = React.ForwardRefExoticComponent<
+  MapViewProps & React.RefAttributes<MapViewInstance>
+>;
+
+let MapView: MapViewType | null = null;
+// Camera component is reserved for future use
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let _Camera: React.ComponentType<CameraProps> | null = null;
 
 if (FeatureFlags.supportsNativeMap) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -184,7 +191,7 @@ export default function Map3DScreen() {
     <SafeAreaView style={styles.screen}>
       {/* ── 3D Map canvas ──────────────────────────────────────────────── */}
       <MapView
-        ref={mapRef as unknown as React.RefObject<never>}
+        ref={mapRef}
         style={StyleSheet.absoluteFill}
         mapType="standard"
         showsBuildings

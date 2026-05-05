@@ -7,10 +7,26 @@ import type { RootStackScreenProps } from '@/navigation/types';
 import { Colors, FontFamily, FontSize, Spacing, GlobalStyles } from '@/theme';
 import { FeatureFlags } from '@/config/featureFlags';
 
+// ─── expo-gl context type augmentation ───────────────────────────────────────
+/** expo-gl extends WebGLRenderingContext with an explicit frame-flush method. */
+interface ExpoGLRenderingContext extends WebGLRenderingContext {
+  endFrameEXP(): void;
+}
+
+/** Minimal HTMLCanvasElement-like object that Three.js WebGLRenderer accepts. */
+interface ExpoGLCanvas {
+  width: number;
+  height: number;
+  clientHeight: number;
+  style: Record<string, unknown>;
+  addEventListener(): void;
+  removeEventListener(): void;
+}
+
 // ─── Conditional imports – expo-gl / Three.js not available on web ────────────
 let GLView: React.ComponentType<{
   style?: object;
-  onContextCreate: (gl: WebGLRenderingContext) => void;
+  onContextCreate: (gl: ExpoGLRenderingContext) => void;
 }> | null = null;
 
 if (FeatureFlags.supportsExpoGL) {
@@ -25,23 +41,23 @@ if (FeatureFlags.supportsExpoGL) {
  * The scene renders a stylised Sydney skyline as coloured box geometry –
  * no external assets required.
  */
-function setupThreeScene(gl: WebGLRenderingContext): () => void {
+function setupThreeScene(gl: ExpoGLRenderingContext): () => void {
   // Lazy-require Three.js only when the GL context is available
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const THREE = require('three') as typeof import('three');
 
+  const expoCanvas: ExpoGLCanvas = {
+    width: gl.drawingBufferWidth,
+    height: gl.drawingBufferHeight,
+    clientHeight: gl.drawingBufferHeight,
+    style: {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  };
+
   const renderer = new THREE.WebGLRenderer({
-    // @ts-ignore – expo-gl context is compatible but typed differently
-    canvas: {
-      width: gl.drawingBufferWidth,
-      height: gl.drawingBufferHeight,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      style: {} as any,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-      clientHeight: gl.drawingBufferHeight,
-    },
-    context: gl,
+    canvas: expoCanvas as unknown as HTMLCanvasElement,
+    context: gl as unknown as WebGL2RenderingContext,
   });
   renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight, false);
   renderer.setClearColor(new THREE.Color(Colors.deepNavy));
@@ -123,9 +139,8 @@ function setupThreeScene(gl: WebGLRenderingContext): () => void {
     camera.lookAt(0, 3, 0);
 
     renderer.render(scene, camera);
-    // expo-gl requires explicit flush each frame
-    // @ts-ignore
-    gl.endFrameEXP?.();
+    // expo-gl requires an explicit frame flush after each render
+    gl.endFrameEXP();
   }
 
   animate();
@@ -145,7 +160,7 @@ export default function Overview3DScreen({ navigation }: Props) {
   const { t } = useTranslation();
   const cleanupRef = useRef<(() => void) | null>(null);
 
-  const handleContextCreate = useCallback((gl: WebGLRenderingContext) => {
+  const handleContextCreate = useCallback((gl: ExpoGLRenderingContext) => {
     cleanupRef.current = setupThreeScene(gl);
   }, []);
 
