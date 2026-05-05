@@ -9,10 +9,13 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { RootStackScreenProps } from '@/navigation/types';
+import { sendOnboardingMessage, ChatMessage } from '@/services/ai';
+import { ApiError } from '@/services/api/client';
 import {
   Colors,
   FontFamily,
@@ -35,25 +38,53 @@ export default function AiOnboardingChatScreen({ navigation }: Props) {
   const flatListRef = useRef<FlatList>(null);
 
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '0',
-      role: 'assistant',
-      text: t('screens.aiOnboarding.greeting'),
-    },
+    { id: '0', role: 'assistant', text: t('screens.aiOnboarding.greeting') },
   ]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastHistory, setLastHistory] = useState<ChatMessage[]>([]);
+
+  const doSend = useCallback(async (history: ChatMessage[]) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await sendOnboardingMessage(history);
+      const assistantMsg: Message = {
+        id: `a-${Date.now()}`,
+        role: 'assistant',
+        text: res.reply,
+      };
+      setMessages((prev) => [...prev, assistantMsg]);
+      setChatHistory((prev) => [...prev, { role: 'assistant', content: res.reply }]);
+    } catch (err: unknown) {
+      const msg = err instanceof ApiError
+        ? `Error ${err.status}: ${String((err.body as { error?: { message?: string } })?.error?.message ?? err.message)}`
+        : 'Failed to get response. Please try again.';
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const handleSend = useCallback(() => {
     const trimmed = input.trim();
-    if (!trimmed) return;
+    if (!trimmed || isLoading) return;
 
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', text: trimmed };
+    const userMsg: Message = { id: `u-${Date.now()}`, role: 'user', text: trimmed };
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
 
-    // TODO: wire to POST /ai/onboarding via apiClient
-    // The response will be streamed back and appended as an assistant message.
-  }, [input]);
+    const updated: ChatMessage[] = [...chatHistory, { role: 'user', content: trimmed }];
+    setChatHistory(updated);
+    setLastHistory(updated);
+    void doSend(updated);
+  }, [input, isLoading, chatHistory, doSend]);
+
+  const handleRetry = useCallback(() => {
+    if (lastHistory.length > 0) void doSend(lastHistory);
+  }, [lastHistory, doSend]);
 
   const handleSkip = useCallback(() => {
     navigation.replace('Overview3D');
@@ -66,7 +97,6 @@ export default function AiOnboardingChatScreen({ navigation }: Props) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={0}
       >
-        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>{t('screens.aiOnboarding.title')}</Text>
           <TouchableOpacity onPress={handleSkip}>
@@ -74,7 +104,15 @@ export default function AiOnboardingChatScreen({ navigation }: Props) {
           </TouchableOpacity>
         </View>
 
-        {/* Message list */}
+        {error && (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity onPress={handleRetry} style={styles.retryBtn}>
+              <Text style={styles.retryText}>{t('common.retry', 'Retry')}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -91,22 +129,38 @@ export default function AiOnboardingChatScreen({ navigation }: Props) {
               <Text style={styles.bubbleText}>{item.text}</Text>
             </View>
           )}
+          ListFooterComponent={
+            isLoading ? (
+              <View style={styles.typingIndicator}>
+                <ActivityIndicator color={Colors.gold} size="small" />
+                <Text style={styles.typingText}>{t('common.loading', 'Thinking…')}</Text>
+              </View>
+            ) : null
+          }
         />
 
-        {/* Input row */}
         <View style={[styles.inputRow, GlassStyles.sheet]}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, GlassStyles.input]}
             value={input}
             onChangeText={setInput}
-            placeholder={t('screens.aiOnboarding.placeholder')}
+            placeholder={t('screens.aiOnboarding.inputPlaceholder', 'Tell me about yourself…')}
             placeholderTextColor={Colors.midGray}
             multiline
-            returnKeyType="send"
+            editable={!isLoading}
             onSubmitEditing={handleSend}
+            returnKeyType="send"
           />
-          <TouchableOpacity style={styles.sendBtn} onPress={handleSend}>
-            <Text style={styles.sendBtnText}>{t('screens.aiOnboarding.send')}</Text>
+          <TouchableOpacity
+            style={[styles.sendBtn, isLoading && styles.sendBtnDisabled]}
+            onPress={handleSend}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={Colors.deepNavy} size="small" />
+            ) : (
+              <Text style={styles.sendBtnText}>↑</Text>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -117,11 +171,12 @@ export default function AiOnboardingChatScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   screen: { ...GlobalStyles.screen },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   title: {
     fontFamily: FontFamily.bold,
@@ -129,61 +184,105 @@ const styles = StyleSheet.create({
     color: Colors.white,
   },
   skip: {
-    fontFamily: FontFamily.medium,
+    fontFamily: FontFamily.semiBold,
     fontSize: FontSize.base,
     color: Colors.gold,
   },
-  messageList: { padding: Spacing.lg, flexGrow: 1 },
+  errorBanner: {
+    marginHorizontal: Spacing.md,
+    marginBottom: Spacing.sm,
+    backgroundColor: 'rgba(244,67,54,0.2)',
+    borderWidth: 1,
+    borderColor: Colors.error,
+    borderRadius: 12,
+    padding: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  errorText: {
+    color: Colors.error,
+    fontFamily: FontFamily.regular,
+    fontSize: FontSize.sm,
+    flex: 1,
+    marginRight: Spacing.sm,
+  },
+  retryBtn: {
+    backgroundColor: Colors.error,
+    borderRadius: 8,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 4,
+  },
+  retryText: {
+    color: Colors.white,
+    fontFamily: FontFamily.semiBold,
+    fontSize: FontSize.xs,
+  },
+  messageList: {
+    paddingHorizontal: Spacing.md,
+    paddingBottom: Spacing.lg,
+    flexGrow: 1,
+  },
   bubble: {
     maxWidth: '80%',
-    padding: Spacing.md,
     borderRadius: 16,
-    marginBottom: Spacing.sm,
+    padding: Spacing.sm,
+    marginVertical: Spacing.xs,
   },
   assistantBubble: {
     backgroundColor: Colors.glassBg,
     borderWidth: 1,
     borderColor: Colors.glassBorder,
     alignSelf: 'flex-start',
-    borderBottomLeftRadius: 4,
   },
   userBubble: {
     backgroundColor: Colors.gold,
     alignSelf: 'flex-end',
-    borderBottomRightRadius: 4,
   },
   bubbleText: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.base,
     color: Colors.white,
   },
+  typingIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: Spacing.sm,
+    alignSelf: 'flex-start',
+  },
+  typingText: {
+    color: Colors.midGray,
+    fontFamily: FontFamily.regular,
+    fontSize: FontSize.sm,
+    marginLeft: Spacing.xs,
+  },
   inputRow: {
     flexDirection: 'row',
-    padding: Spacing.md,
     alignItems: 'flex-end',
+    padding: Spacing.md,
     gap: Spacing.sm,
   },
   input: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
-    padding: Spacing.sm,
+    maxHeight: 100,
     color: Colors.white,
     fontFamily: FontFamily.regular,
     fontSize: FontSize.base,
-    maxHeight: 120,
   },
   sendBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: Colors.gold,
-    borderRadius: 12,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendBtnDisabled: {
+    backgroundColor: Colors.goldDark,
   },
   sendBtnText: {
-    fontFamily: FontFamily.bold,
-    fontSize: FontSize.sm,
+    fontSize: 20,
     color: Colors.deepNavy,
+    fontFamily: FontFamily.bold,
   },
 });

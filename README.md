@@ -230,11 +230,68 @@ Use `FontFamily.regular / medium / semiBold / bold` from `src/theme/typography.t
 | Step | Scope | Status |
 |---|---|---|
 | **1** | Project setup, navigation structure, i18n scaffolding, theming | ✅ Done |
-| **2** | Live API integrations (OpenAI, Google Places, Transport NSW, Yelp) | ⏳ Pending |
+| **2** | Live API integrations (OpenAI, Google Places, Transport NSW, Yelp) | ✅ Done |
 | **3** | 3D rendering (Three.js / Mapbox GL), expo-gl, blur effects | ⏳ Pending |
 | **4** | Authentication (Firebase), user profiles, itinerary persistence | ⏳ Pending |
 | **5** | Offline support, push notifications, deep linking | ⏳ Pending |
 | **6** | Performance tuning, accessibility (a11y), App Store submission | ⏳ Pending |
+
+---
+
+## Step 2 – Live API Integrations
+
+### What was wired in Step 2
+
+**Backend (`services/api`)**
+
+| Route | Provider | Description |
+|---|---|---|
+| `POST /v1/ai/chat` | OpenAI | Multi-turn chat completions |
+| `POST /v1/ai/onboarding` | OpenAI | Onboarding conversation flow |
+| `POST /v1/ai/recommendations` | OpenAI | Personalised Sydney recommendations |
+| `GET /v1/places/search` | Google Places | Full-text place search |
+| `GET /v1/places/nearby` | Google Places | Nearby places by lat/lng |
+| `GET /v1/places/categories` | Static taxonomy | 10 Sydney-relevant place categories |
+| `GET /v1/places/:id` | Google Places | Place detail |
+| `GET /v1/restaurants/search` | Yelp Fusion | Restaurant search |
+| `GET /v1/restaurants/:id` | Yelp Fusion | Restaurant detail |
+| `GET /v1/restaurants/:id/reviews` | Yelp Fusion | Restaurant reviews |
+| `GET /v1/transport/trip` | Transport NSW | Trip planner |
+| `GET /v1/transport/departures` | Transport NSW | Real-time stop departures |
+| `GET /v1/transport/alerts` | Transport NSW | Service alerts |
+
+**Mobile (`apps/mobile`)**
+
+| Screen | Live data |
+|---|---|
+| `AiChatScreen` | POST /v1/ai/chat with typing indicator & error retry |
+| `AiOnboardingChatScreen` | POST /v1/ai/onboarding with full chat history |
+| `ExploreScreen` | GET /v1/places/categories + /v1/places/nearby with category filtering |
+| `RestaurantsScreen` | GET /v1/restaurants/search with Yelp data |
+| `TransportScreen` | GET /v1/transport/trip + /v1/transport/departures |
+
+New service modules: `src/services/ai.ts`, `src/services/places.ts`, `src/services/restaurants.ts`, `src/services/transport.ts`
+
+### New Step 2 environment variables
+
+All keys were already documented in `.env.example` files. No new variables added.
+
+**`services/api/.env`** (keys used in Step 2):
+
+| Variable | Provider | Required |
+|---|---|---|
+| `OPENAI_API_KEY` | OpenAI Platform | ✅ |
+| `OPENAI_MODEL` | OpenAI Platform | default: `gpt-4o` |
+| `GOOGLE_PLACES_API_KEY` | Google Cloud Console | ✅ |
+| `YELP_API_KEY` | Yelp Fusion | ✅ |
+| `TRANSPORT_NSW_API_KEY` | Transport NSW Open Data | ✅ |
+| `TRANSPORT_NSW_BASE_URL` | Transport NSW | default: `https://api.transport.nsw.gov.au/v2` |
+
+**How to get keys:**
+- OpenAI: https://platform.openai.com/api-keys
+- Google Places: https://console.cloud.google.com → enable "Places API (Legacy)"
+- Yelp Fusion: https://fusion.yelp.com
+- Transport NSW: https://opendata.transport.nsw.gov.au (free registration)
 
 ---
 
