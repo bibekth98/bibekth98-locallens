@@ -1,40 +1,195 @@
-import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { BlurView } from 'expo-blur';
 
 import type { RootStackScreenProps } from '@/navigation/types';
-import { Colors, FontFamily, FontSize, Spacing, GlobalStyles, GlassStyles } from '@/theme';
+import { Colors, FontFamily, FontSize, Spacing, GlobalStyles } from '@/theme';
+import { FeatureFlags } from '@/config/featureFlags';
+
+// ─── Conditional imports – expo-gl / Three.js not available on web ────────────
+let GLView: React.ComponentType<{
+  style?: object;
+  onContextCreate: (gl: WebGLRenderingContext) => void;
+}> | null = null;
+
+if (FeatureFlags.supportsExpoGL) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  GLView = require('expo-gl').GLView;
+}
+
+// ─── Three.js scene setup ─────────────────────────────────────────────────────
+
+/**
+ * Bootstrap a simple animated Three.js scene inside an expo-gl context.
+ * The scene renders a stylised Sydney skyline as coloured box geometry –
+ * no external assets required.
+ */
+function setupThreeScene(gl: WebGLRenderingContext): () => void {
+  // Lazy-require Three.js only when the GL context is available
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const THREE = require('three') as typeof import('three');
+
+  const renderer = new THREE.WebGLRenderer({
+    // @ts-ignore – expo-gl context is compatible but typed differently
+    canvas: {
+      width: gl.drawingBufferWidth,
+      height: gl.drawingBufferHeight,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      style: {} as any,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      clientHeight: gl.drawingBufferHeight,
+    },
+    context: gl,
+  });
+  renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight, false);
+  renderer.setClearColor(new THREE.Color(Colors.deepNavy));
+
+  const scene = new THREE.Scene();
+  const aspect = gl.drawingBufferWidth / gl.drawingBufferHeight;
+  const camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 1000);
+  camera.position.set(0, 8, 24);
+  camera.lookAt(0, 2, 0);
+
+  // ── Lighting ──────────────────────────────────────────────────────────────
+  const ambientLight = new THREE.AmbientLight(0x4466aa, 1.2);
+  scene.add(ambientLight);
+  const dirLight = new THREE.DirectionalLight(0xffd700, 1.5);
+  dirLight.position.set(10, 20, 10);
+  scene.add(dirLight);
+
+  // ── Ground plane ──────────────────────────────────────────────────────────
+  const groundGeo = new THREE.PlaneGeometry(60, 40);
+  const groundMat = new THREE.MeshLambertMaterial({ color: 0x0d1b2a });
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  scene.add(ground);
+
+  // ── Harbour ───────────────────────────────────────────────────────────────
+  const harbourGeo = new THREE.PlaneGeometry(60, 15);
+  const harbourMat = new THREE.MeshLambertMaterial({
+    color: 0x1a3a5a,
+    transparent: true,
+    opacity: 0.85,
+  });
+  const harbour = new THREE.Mesh(harbourGeo, harbourMat);
+  harbour.rotation.x = -Math.PI / 2;
+  harbour.position.z = -10;
+  harbour.position.y = 0.01;
+  scene.add(harbour);
+
+  // ── Sydney CBD buildings ──────────────────────────────────────────────────
+  const goldColor = new THREE.Color(Colors.gold);
+  const navyLightColor = new THREE.Color(Colors.navyLight);
+
+  const buildingData = [
+    // Sydney Tower (tallest)
+    { x: 0, z: 0, w: 1.2, d: 1.2, h: 18, color: goldColor },
+    // CBD blocks
+    { x: -5, z: 0, w: 2.5, d: 2.5, h: 10, color: navyLightColor },
+    { x: -8, z: 1, w: 2, d: 2, h: 7, color: navyLightColor },
+    { x: 5, z: 0, w: 2.5, d: 2.5, h: 9, color: navyLightColor },
+    { x: 8, z: 1, w: 2, d: 2, h: 6, color: navyLightColor },
+    { x: -3, z: -2, w: 1.8, d: 1.8, h: 12, color: navyLightColor },
+    { x: 3, z: -2, w: 1.8, d: 1.8, h: 11, color: navyLightColor },
+    { x: -6, z: -3, w: 1.5, d: 1.5, h: 8, color: navyLightColor },
+    { x: 6, z: -3, w: 1.5, d: 1.5, h: 8, color: navyLightColor },
+    // Opera House base
+    { x: 10, z: -8, w: 4, d: 3, h: 1.5, color: new THREE.Color(0xf0ece0) },
+    // Harbour Bridge pylons
+    { x: -14, z: -10, w: 1.5, d: 1.5, h: 5, color: new THREE.Color(0x8a8a8a) },
+    { x: 14, z: -10, w: 1.5, d: 1.5, h: 5, color: new THREE.Color(0x8a8a8a) },
+  ];
+
+  buildingData.forEach(({ x, z, w, d, h, color }) => {
+    const geo = new THREE.BoxGeometry(w, h, d);
+    const mat = new THREE.MeshLambertMaterial({ color });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, h / 2, z);
+    scene.add(mesh);
+  });
+
+  // ── Animation loop ────────────────────────────────────────────────────────
+  let animFrameId: ReturnType<typeof requestAnimationFrame>;
+  let angle = 0;
+
+  function animate() {
+    animFrameId = requestAnimationFrame(animate);
+    angle += 0.003;
+    // Slowly rotate camera around the scene
+    camera.position.x = Math.sin(angle) * 24;
+    camera.position.z = Math.cos(angle) * 24;
+    camera.lookAt(0, 3, 0);
+
+    renderer.render(scene, camera);
+    // expo-gl requires explicit flush each frame
+    // @ts-ignore
+    gl.endFrameEXP?.();
+  }
+
+  animate();
+
+  // Return cleanup function
+  return () => {
+    cancelAnimationFrame(animFrameId);
+    renderer.dispose();
+  };
+}
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 type Props = RootStackScreenProps<'Overview3D'>;
 
-/**
- * 3D Overview Screen
- *
- * This screen will host a WebGL/Three.js 3D cityscape of Sydney rendered
- * inside a WebView or via expo-gl. The actual 3D renderer will be wired
- * in a later step. The placeholder below provides the correct layout shell.
- */
 export default function Overview3DScreen({ navigation }: Props) {
   const { t } = useTranslation();
+  const cleanupRef = useRef<(() => void) | null>(null);
+
+  const handleContextCreate = useCallback((gl: WebGLRenderingContext) => {
+    cleanupRef.current = setupThreeScene(gl);
+  }, []);
 
   const handleExplore = useCallback(() => {
+    cleanupRef.current?.();
     navigation.replace('Main');
   }, [navigation]);
 
   return (
     <SafeAreaView style={styles.screen}>
-      {/* 3D canvas placeholder – wired in Step 3 */}
-      <View style={styles.canvasPlaceholder}>
-        <Text style={styles.placeholderLabel}>[3D Sydney Cityscape]</Text>
-        <Text style={styles.placeholderSub}>Three.js / expo-gl renderer (Step 3)</Text>
-      </View>
+      {/* ── 3D canvas ───────────────────────────────────────────────────── */}
+      {FeatureFlags.supportsExpoGL && GLView ? (
+        <GLView style={StyleSheet.absoluteFill} onContextCreate={handleContextCreate} />
+      ) : (
+        // Web fallback – gradient placeholder
+        <View style={styles.webFallback}>
+          <Text style={styles.fallbackIcon}>🌆</Text>
+          <Text style={styles.fallbackLabel}>Sydney Cityscape</Text>
+          <Text style={styles.fallbackSub}>(3D view available on iOS / Android)</Text>
+        </View>
+      )}
 
-      {/* Overlay UI */}
+      {/* ── Overlay UI ──────────────────────────────────────────────────── */}
       <View style={styles.overlay}>
-        <Text style={styles.title}>{t('screens.overview3d.title')}</Text>
+        {Platform.OS !== 'web' ? (
+          <BlurView intensity={30} tint="dark" style={styles.titleBlur}>
+            <Text style={styles.title}>{t('screens.overview3d.title')}</Text>
+          </BlurView>
+        ) : (
+          <View style={styles.titleFallback}>
+            <Text style={styles.title}>{t('screens.overview3d.title')}</Text>
+          </View>
+        )}
 
-        <TouchableOpacity style={[styles.exploreBtn, GlassStyles.pill]} onPress={handleExplore}>
-          <Text style={styles.exploreBtnText}>{t('screens.overview3d.explore')}</Text>
+        <TouchableOpacity style={styles.exploreBtn} onPress={handleExplore} activeOpacity={0.8}>
+          {Platform.OS !== 'web' ? (
+            <BlurView intensity={40} tint="light" style={styles.exploreBtnInner}>
+              <Text style={styles.exploreBtnText}>{t('screens.overview3d.explore')}</Text>
+            </BlurView>
+          ) : (
+            <View style={[styles.exploreBtnInner, styles.exploreBtnFallback]}>
+              <Text style={styles.exploreBtnText}>{t('screens.overview3d.explore')}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -43,42 +198,78 @@ export default function Overview3DScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   screen: { ...GlobalStyles.screen },
-  canvasPlaceholder: {
+
+  webFallback: {
     flex: 1,
-    backgroundColor: Colors.navy,
+    backgroundColor: Colors.deepNavy,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  placeholderLabel: {
-    fontFamily: FontFamily.medium,
-    fontSize: FontSize.lg,
-    color: Colors.midGray,
+  fallbackIcon: {
+    fontSize: 64,
+    marginBottom: Spacing.md,
   },
-  placeholderSub: {
+  fallbackLabel: {
+    fontFamily: FontFamily.bold,
+    fontSize: FontSize.xl,
+    color: Colors.white,
+  },
+  fallbackSub: {
     fontFamily: FontFamily.regular,
     fontSize: FontSize.sm,
     color: Colors.midGray,
     marginTop: Spacing.xs,
+    textAlign: 'center',
+    paddingHorizontal: Spacing.xl,
   },
+
   overlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    padding: Spacing.xl,
+    paddingBottom: Spacing.xl,
+    paddingHorizontal: Spacing.xl,
     alignItems: 'center',
+    gap: Spacing.lg,
+  },
+  titleBlur: {
+    borderRadius: 16,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
+  },
+  titleFallback: {
+    backgroundColor: Colors.glassNavy,
+    borderRadius: 16,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   title: {
     fontFamily: FontFamily.bold,
     fontSize: FontSize.xxl,
     color: Colors.white,
-    marginBottom: Spacing.lg,
   },
+
   exploreBtn: {
-    backgroundColor: Colors.gold,
-    borderColor: Colors.gold,
+    borderRadius: 100,
+    overflow: 'hidden',
+  },
+  exploreBtnInner: {
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.xl,
+    alignItems: 'center',
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: Colors.gold,
+    overflow: 'hidden',
+  },
+  exploreBtnFallback: {
+    backgroundColor: Colors.gold,
   },
   exploreBtnText: {
     fontFamily: FontFamily.bold,

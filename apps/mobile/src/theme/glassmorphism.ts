@@ -4,6 +4,10 @@ import { Colors } from './colors';
 /**
  * Glassmorphism utility styles for SydneyGo.
  * Apply these as base and merge with component-specific overrides.
+ *
+ * On native platforms (iOS / Android) combine these styles with expo-blur's
+ * BlurView for real backdrop-filter blur (see GlassCard component).
+ * On web a semi-transparent background is used as a fallback.
  */
 
 export interface GlassStyle {
@@ -22,7 +26,6 @@ export const GlassStyles = StyleSheet.create<Record<string, ViewStyle | TextStyl
     borderColor: Colors.glassBorder,
     borderRadius: 16,
     overflow: 'hidden',
-    // Note: full backdrop-filter blur requires @react-native-community/blur on native
   },
 
   /** Darker glass card for contrast over light backgrounds */
@@ -71,6 +74,27 @@ export const GlassStyles = StyleSheet.create<Record<string, ViewStyle | TextStyl
     borderLeftWidth: 1,
     borderRightWidth: 1,
     borderColor: Colors.glassBorder,
+    overflow: 'hidden',
+  },
+
+  /**
+   * Blur-card: intended for use inside a BlurView wrapper (GlassCard).
+   * The translucent tint sits above the blur layer for the correct layering.
+   */
+  blurCard: {
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+
+  /** Blur pill – use inside BlurView / GlassCard */
+  blurPill: {
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
+    borderRadius: 100,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     overflow: 'hidden',
   },
 });

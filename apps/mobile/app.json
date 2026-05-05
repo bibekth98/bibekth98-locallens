@@ -33,6 +33,12 @@
         {
           "fonts": []
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "SydneyGo needs location access to show your position on the 3D map."
+        }
       ]
     ],
     "scheme": "sydneygo",

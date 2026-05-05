@@ -231,7 +231,7 @@ Use `FontFamily.regular / medium / semiBold / bold` from `src/theme/typography.t
 |---|---|---|
 | **1** | Project setup, navigation structure, i18n scaffolding, theming | ✅ Done |
 | **2** | Live API integrations (OpenAI, Google Places, Transport NSW, Yelp) | ✅ Done |
-| **3** | 3D rendering (Three.js / Mapbox GL), expo-gl, blur effects | ⏳ Pending |
+| **3** | 3D rendering (Three.js / Mapbox GL), expo-gl, blur effects | ✅ Done |
 | **4** | Authentication (Firebase), user profiles, itinerary persistence | ⏳ Pending |
 | **5** | Offline support, push notifications, deep linking | ⏳ Pending |
 | **6** | Performance tuning, accessibility (a11y), App Store submission | ⏳ Pending |
@@ -292,6 +292,44 @@ All keys were already documented in `.env.example` files. No new variables added
 - Google Places: https://console.cloud.google.com → enable "Places API (Legacy)"
 - Yelp Fusion: https://fusion.yelp.com
 - Transport NSW: https://opendata.transport.nsw.gov.au (free registration)
+
+---
+
+## Step 3 – 3D Rendering & Blur Effects
+
+### What was added in Step 3
+
+**New packages (`apps/mobile`)**
+
+| Package | Version | Purpose |
+|---|---|---|
+| `expo-blur` | ~13.0.2 | Real `BlurView` backdrop-blur on iOS / Android |
+| `expo-gl` | ~13.6.0 | WebGL context for Three.js |
+| `three` | ~0.164.x | 3D scene rendering (Sydney cityscape) |
+| `react-native-maps` | ~1.18.0 | Native 3D perspective map with 3D buildings |
+| `expo-location` | ~17.0.1 | Location permission + user position pin on map |
+
+**Screen changes**
+
+| Screen | What changed |
+|---|---|
+| `Overview3DScreen` | Replaced placeholder with a full Three.js / expo-gl animated 3D Sydney skyline scene. Camera slowly orbits the CBD, harbour, and Opera House geometry. Falls back to an emoji placeholder on web. |
+| `Map3DScreen` | Replaced placeholder with `react-native-maps` in 3D perspective mode (60° pitch, 3D buildings). Three preset views (CBD, Opera House, Harbour Bridge) with glass-blur control buttons. Falls back to a placeholder on web. |
+
+**Component / theme changes**
+
+| File | What changed |
+|---|---|
+| `GlassCard.tsx` | Now wraps children in `expo-blur`'s `BlurView` on native; falls back to semi-transparent `View` on web. |
+| `glassmorphism.ts` | Added `blurCard` and `blurPill` style variants for use inside `BlurView` containers. Removed stale comment about `@react-native-community/blur`. |
+| `config/featureFlags.ts` | New module – `FeatureFlags.supportsBlur`, `.supportsExpoGL`, `.supportsNativeMap` (all `false` on web). |
+
+### Step 3 setup notes
+
+1. **iOS**: `expo-location` requires the `NSLocationWhenInUseUsageDescription` key; the `expo-location` plugin in `app.json` handles this automatically on EAS builds.  
+2. **Android**: `react-native-maps` uses Google Maps by default — add your `GOOGLE_MAPS_API_KEY` to `.env` and set `androidGoogleMapsApiKey` in `app.json` for production builds.  
+3. **Web**: All three 3D features show graceful fallback UI — no native modules are loaded.  
+4. **Expo Go**: `react-native-maps` and `expo-gl` work in Expo Go on iOS and Android.
 
 ---
 
